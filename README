@@ -1,0 +1,116 @@
+django-billing is a simple, generic, plans, pricing and recurring billing billing app to monitor and enforce quotas, pre-paid and usage-based features.
+
+There are four steps needed to get started:
+
+1. Install django-billing
+2. Plug in a billing processor
+3. Define your products
+4. Create your templates
+
+
+Installation
+------------
+
+1. pip install django-billing
+2. add `billing` to your list of installed apps
+
+
+Billing Processors
+------------------
+
+While django-billing collects all the information needed to bill
+customers, it doesn't take a stance on how payments should be collected. django-billing delegates responsibility for actually charging a customer
+to a billing processor.
+
+
+
+
+Defining Products
+-----------------
+
+Products are what your customers subscribe to, and are defined as
+classes (in a similar manner to Django models).
+
+A Product class is used for three puposes:
+
+1. to check the usage of a given feature
+2. to enforce limits upon the usage of features
+3. to calculate information for invoices
+
+For example, in the example project shipped with django-billing,
+there is a base definition 
+
+They are defined as a collection of features (each of which is
+composed of a value and a provisioning scheme) along with
+certain details about usage limits and pricing.
+
+django-billing relies on python-pricing to set up the
+pricing model.
+
+products should be defined in a `products.py` file
+
+An example of defining products can be seen in
+example_saas_project/core/products.py
+
+Since products are often created by class hierarchies, only those products
+which you wish to be subscribable should be imported into a billing.py
+
+Point to this billing definitions module with ``BILLING_DEFINITIONS``
+in settings.py. In the example, the billing definitions are
+in example_saas_project/core/billing.py, so in settings.py, we've added::
+
+    BILLING_DEFINITIONS = 'example_saas_project.core.billing'
+
+
+Templates
+---------
+
+You need to define a number of templates. There are examples in
+example_saas_project/core/templates/billing
+
+billing/current_subscription.html
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+billing/details.html
+^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+billing/history.html
+^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+billing/overview.html
+^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+billing/subscription_billing_details.html
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+billing/subscription_confirmation.html
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+Motivation
+==========
+
+TODO
+
+
+Writing a Billing Processor
+===========================
+
+TODO
