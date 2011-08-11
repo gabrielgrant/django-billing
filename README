@@ -12,7 +12,9 @@ Installation
 ------------
 
 1. pip install django-billing
-2. add `billing` to your list of installed apps
+2. set up the dependencies
+3. add `billing` to your list of installed apps
+4. run ``python manage.py migrate billing``
 
 
 Billing Processors
