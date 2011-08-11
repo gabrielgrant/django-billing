@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+Enter Billing Details
+
+<form action="" method="post">
+{{ csrf_token }}{{ form.non_form_errors }}
+{{ form.as_p }}
+<input type=submit value="Subscribe" />
+</form>
+{% endblock %}

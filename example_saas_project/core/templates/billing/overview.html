@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+Billing Overview
+<table>
+{% for product in products_desc %}
+<tr><td>{{ product.verbose_name }}</td><td>{{ product.base_price }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

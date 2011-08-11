@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+
+<h1>Change your plan</h1>
+
+<p>You are about to change to the free plan. Confirm change?</p>
+
+<form method="post" action="">
+{% csrf_token %}{{ form.non_form_errors }}
+{{ form.as_p }}
+<input type="submit" name="submit" value="Yes, change my plan" />
+</form>
+<a href="../">No, don't change my plan</a>
+{% endblock %}
