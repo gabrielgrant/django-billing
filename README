@@ -1,5 +1,8 @@
 django-billing is a simple, generic, plans, pricing and recurring billing billing app to monitor and enforce quotas, pre-paid and usage-based features.
 
+Quick Start
+===========
+
 There are four steps needed to get started:
 
 1. Install django-billing
@@ -8,8 +11,8 @@ There are four steps needed to get started:
 4. Create your templates
 
 
-Installation
-------------
+1. Installation
+---------------
 
 1. pip install django-billing
 2. set up the dependencies
@@ -17,18 +20,27 @@ Installation
 4. run ``python manage.py migrate billing``
 
 
-Billing Processors
-------------------
+2. Billing Processors
+---------------------
 
 While django-billing collects all the information needed to bill
 customers, it doesn't take a stance on how payments should be collected. django-billing delegates responsibility for actually charging a customer
-to a billing processor.
+to a billing processor. Individual billing processors interface with
+different payment collection gateways to actually collect money.
 
+Usually you will just need to install a billing processor by adding it
+into the BILLING_PROCESSORS dict in your settings.py
 
+The example project, for instance, has this declaration in it's settings.py::
 
+    BILLING_PROCESSORS = {
+        'default': 'billing.processor.simple_account.processor.SimpleAccountBillingProcessor',
+    }
 
-Defining Products
------------------
+For more details see the section on billing processors below.
+
+3. Defining Products
+--------------------
 
 Products are what your customers subscribe to, and are defined as
 classes (in a similar manner to Django models).
@@ -64,8 +76,8 @@ in example_saas_project/core/billing.py, so in settings.py, we've added::
     BILLING_DEFINITIONS = 'example_saas_project.core.billing'
 
 
-Templates
----------
+4. Templates
+------------
 
 You need to define a number of templates. There are examples in
 example_saas_project/core/templates/billing
@@ -112,7 +124,54 @@ Motivation
 TODO
 
 
+Billing Processors
+==================
+
+A billing processor is a class that provides a one method and one attribute
+
+has_valid_billing_details(account)
+
+Returns whether the given billing account has valid billing details registered
+with the processor.
+
+billing_details_creation_form
+
+A Django form which collects the details needed to bill an account. This form
+should have a `save()` method which saves the billing details. This method
+may assume that the account for which details are being submitted is stored
+in the `billing_account` property.
+
+Additionally, any urls in the processor's urls.py will be mapped into the billing url space at '/billing/processors/{{ processor_name }}/...'
+
+This can be useful for webhooks callbacks from payment processesor systems.
+
 Writing a Billing Processor
-===========================
+---------------------------
 
 TODO
+
+
+Processor Routers
+=================
+
+A billing processor router is a class that provides a single method:
+
+get_processor_for_account(account)
+
+Suggests the billing processor that should be used for the given account.
+
+Returns None if there is no suggestion
+
+Using Routers
+-------------
+
+Billing processor routers are installed using the BILLING_PROCESSOR_ROUTERS setting. This setting defines a list of class names, each specifying a router that should be used by the master router (`billing.processor.router`)
+
+The master router is used by django-billing to decide which processor to use.
+Whenever an operation needs to perform an operation using a processor, it
+consults the master router, which tries each registered router, in turn, until
+a processor suggestion is found. If no suggestion is found, the master router
+yields the `default` router.
+
+This architecture/API is very much inspired by Django's database routers
+
