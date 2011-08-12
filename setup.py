@@ -17,6 +17,7 @@ setup(
         'django-annoying',
         'django-model-utils',
         'South',
+        'django-jsonfield',
     ],
     dependency_links = [
     	'http://github.com/gabrielgrant/python-pricing/tarball/master#egg=python-pricing',
