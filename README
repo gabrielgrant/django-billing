@@ -1,4 +1,5 @@
-django-billing is a simple, generic, plans, pricing and recurring billing billing app to monitor and enforce quotas, pre-paid and usage-based features.
+django-billing is a simple, generic, plans, pricing and recurring billing
+app. It enforces quotas and tracks pre-paid and usage-based features.
 
 Quick Start
 ===========
@@ -24,7 +25,8 @@ There are four steps needed to get started:
 ---------------------
 
 While django-billing collects all the information needed to bill
-customers, it doesn't take a stance on how payments should be collected. django-billing delegates responsibility for actually charging a customer
+customers, it doesn't take a stance on how payments should be collected.
+django-billing delegates responsibility for actually charging a customer
 to a billing processor. Individual billing processors interface with
 different payment collection gateways to actually collect money.
 
@@ -131,8 +133,8 @@ A billing processor is a class that provides a one method and one attribute
 
 has_valid_billing_details(account)
 
-Returns whether the given billing account has valid billing details registered
-with the processor.
+Returns whether the given billing account has valid billing details
+registered with the processor.
 
 billing_details_creation_form
 
@@ -141,7 +143,8 @@ should have a `save()` method which saves the billing details. This method
 may assume that the account for which details are being submitted is stored
 in the `billing_account` property.
 
-Additionally, any urls in the processor's urls.py will be mapped into the billing url space at '/billing/processors/{{ processor_name }}/...'
+Additionally, any urls in the processor's urls.py will be mapped into the
+billing url space at '/billing/processors/{{ processor_name }}/...'
 
 This can be useful for webhooks callbacks from payment processesor systems.
 
@@ -165,13 +168,15 @@ Returns None if there is no suggestion
 Using Routers
 -------------
 
-Billing processor routers are installed using the BILLING_PROCESSOR_ROUTERS setting. This setting defines a list of class names, each specifying a router that should be used by the master router (`billing.processor.router`)
+Billing processor routers are installed using the BILLING_PROCESSOR_ROUTERS
+setting. This setting defines a list of class names, each specifying a
+router that should be used by the master router (`billing.processor.router`)
 
 The master router is used by django-billing to decide which processor to use.
 Whenever an operation needs to perform an operation using a processor, it
-consults the master router, which tries each registered router, in turn, until
-a processor suggestion is found. If no suggestion is found, the master router
-yields the `default` router.
+consults the master router, which tries each registered router, in turn,
+until a processor suggestion is found. If no suggestion is found, the
+master router yields the `default` router.
 
 This architecture/API is very much inspired by Django's database routers
 
