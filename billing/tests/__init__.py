@@ -3,12 +3,15 @@
 from django.utils import unittest
 from django.test import TestCase
 
+from ordereddict import OrderedDict
+
 from billing import loading
 from billing.models import *
 from billing.processor.simple_account.processor import SimpleAccountBillingProcessor
 from billing.processor.simple_account.models import IOUAccount, AccountIOU
 
 from example_saas_project.core import billing as billing_defs
+from example_saas_project.core import products as product_defs
 
 
 class UserTestCase(TestCase):
@@ -110,7 +113,6 @@ class SubscriptionTests(TestCase):
     def test_init(self):
         pass
 
-
 class DefaultProductTests(UserTestCase):
     def setUp(self):
         try:
@@ -147,10 +149,11 @@ class AdjustmentTests(TestCase):
 
 class CacheTests(TestCase):
     def setUp(self):
-        pass
-        
+        super(CacheTests, self).setUp()
+        self._old_products = loading.product_cache
     def tearDown(self):
-        pass
+        super(CacheTests, self).tearDown()
+        loading.product_cache = self._old_products
         
     def test_get_product(self):
         self.assertEqual(loading.get_product('GoldPlan'), billing_defs.GoldPlan)
@@ -170,6 +173,101 @@ class CacheTests(TestCase):
     def test_get_product(self):
         pt = ProductType.objects.get_for_product(billing_defs.GoldPlan)
         self.assertEqual(pt.get_product_class(), billing_defs.GoldPlan)
+    def test_populate_product_cache_billing_defs(self):
+        BILLING_PRODUCTS = 'example_saas_project.core.billing'
+        loading.product_cache = loading.populate_product_cache(
+            products=BILLING_PRODUCTS,
+        )
+        plans = [
+            billing_defs.FreePlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
+        ]
+        self.assertListEqual(plans, loading.get_products(hidden=True))
+    def test_populate_product_cache_flat_list(self):
+        BILLING_PRODUCTS = [
+            'example_saas_project.core.products.FreePlan',
+            'example_saas_project.core.products.BronzePlan',
+            'example_saas_project.core.products.SilverPlan',
+            'example_saas_project.core.products.GoldPlan',
+            'example_saas_project.core.products.CustomPlan',
+            'example_saas_project.core.products.SecretPlan',
+            'example_saas_project.core.products.EnterprisePlan',
+        ]
+        BILLING_DEFINITIONS = ()
+        loading.product_cache = loading.populate_product_cache(
+            products=BILLING_PRODUCTS,
+        )
+        plans = [
+            billing_defs.FreePlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
+            product_defs.CustomPlan,
+            product_defs.SecretPlan,
+            product_defs.EnterprisePlan,
+        ]
+        self.assertListEqual(plans, loading.get_products(hidden=True))
+    def test_populate_product_cache_module_list(self):
+        BILLING_PRODUCTS = ('example_saas_project.core.products', [
+            'FreePlan',
+            'BronzePlan',
+            'SilverPlan',
+            'GoldPlan',
+            'CustomPlan',
+            'SecretPlan',
+            'EnterprisePlan',
+        ])
+        BILLING_DEFINITIONS = ()
+        loading.product_cache = loading.populate_product_cache(
+            products=BILLING_PRODUCTS,
+        )
+        plans = [
+            billing_defs.FreePlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
+            product_defs.CustomPlan,
+            product_defs.SecretPlan,
+            product_defs.EnterprisePlan,
+        ]
+        self.assertListEqual(plans, loading.get_products(hidden=True))
+
+class AllProductsTestCase(TestCase):
+    def setUp(self):
+        super(AllProductsTestCase, self).setUp()
+        self._old_products = loading.product_cache
+        loading.product_cache = OrderedDict(zip(
+        [
+            'FreePlan',
+            'BronzePlan',
+            'SilverPlan',
+            'GoldPlan',
+            'CustomPlan',
+            'SecretPlan',
+            'EnterprisePlan',
+        ],
+        [
+            billing_defs.FreePlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
+            product_defs.CustomPlan,
+            product_defs.SecretPlan,
+            product_defs.EnterprisePlan,
+        ]))
+    def tearDown(self):
+        loading.product_cache = self._old_products
+
+class HiddenProductTests(AllProductsTestCase):
+    def test_get_products(self):
+        self.assertNotIn(product_defs.SecretPlan, loading.get_products())
+        self.assertIn(product_defs.SecretPlan, loading.get_products(hidden=True))
+    def test_producttype(self):
+        billing.management.update_all_producttypes(verbosity=0)
+        pt = ProductType.objects.get_for_product(product_defs.SecretPlan)
+        self.assertEqual(pt.get_product_class(), product_defs.SecretPlan)
 
 
 ########  View tests  #############

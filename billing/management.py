@@ -17,7 +17,7 @@ def update_producttypes(app, created_models, verbosity=2, **kwargs):
 def update_all_producttypes(verbosity=2):
     
     product_types = list(ProductType.objects.all())
-    for product in get_products():
+    for product in get_products(hidden=True):
         try:
             pt = ProductType.objects.get(name=product.__name__)
             product_types.remove(pt)

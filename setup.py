@@ -18,6 +18,7 @@ setup(
         'django-model-utils',
         'South',
         'django-jsonfield',
+        'ordereddict',
     ],
     dependency_links = [
     	'http://github.com/gabrielgrant/python-pricing/tarball/master#egg=python-pricing',

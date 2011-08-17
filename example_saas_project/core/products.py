@@ -49,3 +49,12 @@ class FreePlan(MySaaSAppAccount):
     class StorageSpace(MySaaSAppAccount.StorageSpace, MeteredFeature):
         pricing_scheme=FixedInclusion(included=0)
 
+class SecretPlan(SilverPlan):
+    base_price = 0
+    hidden = True
+
+class EnterprisePlan(GoldPlan):
+    pass
+
+class CustomPlan(GoldPlan):
+    pass 

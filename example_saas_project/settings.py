@@ -125,7 +125,8 @@ INSTALLED_APPS = (
     'example_saas_project.core',
 )
 
-BILLING_DEFINITIONS = 'example_saas_project.core.billing'
+BILLING_PRODUCTS = 'example_saas_project.core.billing'
+
 BILLING_PROCESSORS = {
     'default': 'billing.processor.simple_account.processor.SimpleAccountBillingProcessor',
 }

@@ -1,5 +1,7 @@
 from django.conf import settings
 
+from ordereddict import OrderedDict
+
 from pricing.products import Product
 #from billing.adjustments import Adjustment
 
@@ -12,21 +14,57 @@ def from_x_import_y(x, y):
     module = __import__(x, fromlist=x.rsplit('.', 1)[0])
     return getattr(module, y)
 
-product_cache = {}
+
 adjustments_cache = {}
 
-# populate the cache
+def collect_products_from_modules(modules):
+    products = []
+    # populate the cache
+    if isinstance(modules, basestring):
+        modules = (modules,)
+    for module_name in modules:
+        mod = __import__(module_name, fromlist=module_name.rsplit('.', 1)[0])
+        for name, obj in mod.__dict__.items():
+            if isinstance(obj, type):
+                if issubclass(obj, Product):
+                    products.append(obj)
+        #        if issubclass(obj, Adjustment):
+        #            adjustment_cache[name] = obj
+    return products
+
 BILLING_DEFINITIONS = getattr(settings, 'BILLING_DEFINITIONS', ())
-if isinstance(BILLING_DEFINITIONS, basestring):
-    BILLING_DEFINITIONS = (BILLING_DEFINITIONS,)
-for module_name in BILLING_DEFINITIONS:
-    mod = __import__(module_name, fromlist=module_name.rsplit('.', 1)[0])
-    for name, obj in mod.__dict__.items():
-        if isinstance(obj, type):
-            if issubclass(obj, Product):
-                product_cache[name] = obj
-    #        if issubclass(obj, Adjustment):
-    #            adjustment_cache[name] = obj
+BILLING_PRODUCTS = getattr(settings, 'BILLING_PRODUCTS', None)
+
+def populate_product_cache(products=BILLING_PRODUCTS):
+    """ returns the populated cache using products as defined in settings.py
+
+    If defined, products must be one of:
+        a list of product classes
+        a (base_module, [product_class]) tuple
+        a module containing product classes
+    """
+    if not products:
+        product_classes = []
+    elif isinstance(products, basestring):
+        # we have a module containing products
+        product_classes = collect_products_from_modules(products)
+        product_classes.sort(key=lambda x: x.base_price)
+    elif all(isinstance(i, basestring) for i in products):
+        # we have a list of products
+        product_classes = [import_item(p) for p in products]
+    elif len(products) == 2:
+        base_module, classes = products
+        product_classes = [from_x_import_y(base_module, cls) for cls in classes]
+    else:
+        raise ValueError("""Invalid value for "product"
+        If defined, products must be one of:
+            a list of product classes
+            a (base_module, [product_class]) tuple
+            a module containing product classes
+        """)
+    return OrderedDict((pc.name, pc) for pc in product_classes)
+
+product_cache = populate_product_cache()
 
 def get_product(name):
     try:
@@ -37,8 +75,8 @@ def get_product(name):
 #def get_adjustment(name):
 #    return adjustments_cache[name]
 
-def get_products():
-    return product_cache.values()
+def get_products(hidden=False):
+    return [p for p in product_cache.values() if hidden or not p.hidden]
 
 
 # load the billing processors
