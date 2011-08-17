@@ -58,14 +58,20 @@ class Account(models.Model):
           return r[0]
         return None
     def get_current_product(self):
-        sub = self.get_current_subscription()
-        if sub:
-            return sub.get_product()
+        pc = self.get_current_product_class()
+        if pc:
+            return pc()
+        #sub = self.get_current_subscription()
+        #if sub:
+            #return sub.get_product()
+            #return ()
         return None
     def get_current_product_class(self):
         sub = self.get_current_subscription()
         if sub:
             return sub.get_product_class()
+        elif hasattr(settings, 'BILLING_DEFAULT_PRODUCT'):
+            return billing.loading.get_product(settings.BILLING_DEFAULT_PRODUCT)
         return None
     def get_processor(self):
         return processor_router.get_processor_for_account(self)

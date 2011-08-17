@@ -111,6 +111,30 @@ class SubscriptionTests(TestCase):
         pass
 
 
+class DefaultProductTests(UserTestCase):
+    def setUp(self):
+        try:
+            self.old_default_product = settings.DEFAULT_PRODUCT
+        except AttributeError:
+            pass
+        settings.BILLING_DEFAULT_PRODUCT = 'GoldPlan'
+        super(DefaultProductTests, self).setUp()
+
+    def tearDown(self):
+        del settings.BILLING_DEFAULT_PRODUCT
+        try:
+            settings.BILLING_DEFAULT_PRODUCT = self.old_default_product
+        except AttributeError:
+            pass
+        super(DefaultProductTests, self).tearDown()
+
+    def test_default_product(self):
+        pc = self.u.billing_account.get_current_product_class()
+        self.assertIs(pc, billing_defs.GoldPlan)
+        p = self.u.billing_account.get_current_product()
+        self.assertIsInstance(p, billing_defs.GoldPlan)
+
+
 class AdjustmentTests(TestCase):
     def setUp(self):
         pass

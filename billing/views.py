@@ -54,6 +54,12 @@ class BaseBillingDetailsView(FormView):
         return
 
 class BaseSubscriptionView(BaseBillingDetailsView):
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(BaseSubscriptionView, self).get_context_data(**kwargs)
+        product = billing.loading.get_product(self.kwargs['product'])
+        context['product'] = product
+        return context
     def form_valid(self, form):
         super(BaseSubscriptionView, self).form_valid(form)
 
