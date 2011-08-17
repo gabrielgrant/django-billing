@@ -2,6 +2,7 @@ from pricing.products import Product
 from pricing.features import IntegerFeature
 from pricing.features import AllocatedFeature, MeteredFeature
 from pricing.feature_pricing import FixedInclusion, FixedUnitPricing
+from pricing.manual_intervention import ManualApproval, ManualSubscription
 
 class MySaaSAppAccount(Product):
     class Projects(IntegerFeature):
@@ -54,7 +55,7 @@ class SecretPlan(SilverPlan):
     hidden = True
 
 class EnterprisePlan(GoldPlan):
-    pass
+    manual_intervention = ManualApproval
 
 class CustomPlan(GoldPlan):
-    pass 
+    manual_intervention = ManualSubscription
