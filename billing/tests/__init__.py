@@ -9,6 +9,7 @@ from billing import loading
 from billing.models import *
 from billing.processor.simple_account.processor import SimpleAccountBillingProcessor
 from billing.processor.simple_account.models import IOUAccount, AccountIOU
+from billing.templatetags import billing_tags
 
 from example_saas_project.core import billing as billing_defs
 from example_saas_project.core import products as product_defs
@@ -387,6 +388,15 @@ class BillingDetailsViewTests(BaseViewTestCase):
         r = self.client.get('/details/')
         self.assertEqual(r.status_code, 200)
         
+
+###  Template Tag Tests  ###
+
+class ProductChangeTypeTests(UserTestCase):
+    def test_init(self):
+        self.assertEqual(
+            billing_tags.product_change_type(billing_defs.FreePlan, self.u),
+            'upgrade',
+        )
 
 class ProcessorTests(TestCase):
     def setUp(self):
