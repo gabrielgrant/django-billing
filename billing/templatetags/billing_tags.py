@@ -11,7 +11,7 @@ def product_change_type(product, user):
     if isinstance(product, Product):
         product = type(product)
     if upc:
-        products = billing.loading.get_products()
+        products = billing.loading.get_products(hidden=True)
         upc_index = products.index(upc)
         p_index = products.index(product)
         if upc_index < p_index:
