@@ -8,6 +8,7 @@ setup(
         'billing',
         'billing.processor',
         'billing.processor.simple_account',
+        'billing.templatetags',
         'billing.tests',
     ],
     license='LGPL',
