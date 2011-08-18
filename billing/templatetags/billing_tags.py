@@ -14,7 +14,7 @@ def product_change_type(product, user):
         if upc_index < p_index:
             return 'upgrade'
         elif upc_index == p_index:
-            return none
+            return None
         else:
             return 'downgrade'
     else:
