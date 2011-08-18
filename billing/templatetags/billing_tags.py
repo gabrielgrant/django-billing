@@ -1,12 +1,15 @@
 from django import template
 
 import billing.loading
+from pricing.products import Product
 
 register = template.Library()
 
 @register.filter
 def product_change_type(product, user):
     upc = user.billing_account.get_current_product_class()
+    if isinstance(product, Product):
+        product = type(product)
     if upc:
         products = billing.loading.get_products()
         upc_index = products.index(upc)
