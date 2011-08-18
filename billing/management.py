@@ -9,7 +9,7 @@ import south.signals
 
 def update_producttypes(app, verbosity=2, **kwargs):
     # only do this once, after we're synced
-    if app == 'billing':
+    if app == 'billing' or app == billing.models:
         update_all_producttypes(verbosity)
     else:
         return
@@ -54,6 +54,7 @@ If you're unsure, answer 'no'.
                 print "Stale product types remain."
             
 
+signals.post_syncdb.connect(update_producttypes)
 south.signals.post_migrate.connect(update_producttypes)
 
 if __name__ == "__main__":
