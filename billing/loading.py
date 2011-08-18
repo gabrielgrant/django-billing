@@ -3,6 +3,7 @@ from django.conf import settings
 from ordereddict import OrderedDict
 
 from pricing.products import Product
+from pricing.manual_intervention import ManualPreApproval
 #from billing.adjustments import Adjustment
 
 def import_item(x):
@@ -76,7 +77,9 @@ def get_product(name):
 #    return adjustments_cache[name]
 
 def get_products(hidden=False):
-    return [p for p in product_cache.values() if hidden or not p.hidden]
+    def is_hidden(product):
+        return (not hidden) and (p.manual_intervention is ManualPreApproval)
+    return [p for p in product_cache.values() if not is_hidden(p)]
 
 
 # load the billing processors
