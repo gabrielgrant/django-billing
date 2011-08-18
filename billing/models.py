@@ -79,7 +79,16 @@ class Account(models.Model):
         return self.get_processor().has_valid_billing_details(self)
     def subscribe_to_product(self, product):
         return Subscription.objects.create_from_product(product, self)
-    
+    def get_visible_products(self):
+        """ returns the list of products that is visible to the given account """
+        all_products = billing.loading.get_products(hidden=True)
+        public_products = billing.loading.get_products()
+        subscribed_product_types = ProductType.objects  \
+            .filter(subscriptions__billing_account=self)  \
+            .distinct()
+        subscribed_products = set(pt.get_product_class() for pt in subscribed_product_types)
+        visible_products = set(public_products).union(subscribed_products)
+        return [p for p in all_products if p in visible_products]
 
 class ProductTypeManager(models.Manager):
     def get_for_product(self, product):

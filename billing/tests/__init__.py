@@ -74,7 +74,24 @@ class AccountTests(UserTestCase):
         self.assertIsNone(self.a.get_current_product())
         self.a.subscribe_to_product('GoldPlan')
         self.assertEqual(self.a.get_current_product_class(), None)
-
+    def test_get_visible_products(self):
+        all_products = [
+            billing_defs.FreePlan,
+            billing_defs.SecretPlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
+        ]
+        public_products = [all_products[0]] + all_products[2:]
+        self.assertListEqual(self.a.get_visible_products(), public_products)
+        self.a.subscribe_to_product(billing_defs.GoldPlan)
+        self.assertListEqual(self.a.get_visible_products(), public_products)
+        self.a.subscribe_to_product(billing_defs.SecretPlan)
+        self.assertListEqual(self.a.get_visible_products(), all_products)
+        self.a.subscribe_to_product(billing_defs.GoldPlan)
+        self.assertListEqual(self.a.get_visible_products(), all_products)
+        self.a.subscribe_to_product(billing_defs.SecretPlan)
+        self.assertListEqual(self.a.get_visible_products(), all_products)
 
 class ProductTypeTests(TestCase):
     def setUp(self):
@@ -84,7 +101,7 @@ class ProductTypeTests(TestCase):
         pass
         
     def test_autodiscover(self):
-        self.assertEqual(ProductType.objects.count(), 4)
+        self.assertEqual(ProductType.objects.count(), 5)
     def test_get_product_class(self):
         cls = ProductType.objects.get(name='GoldPlan').get_product_class()
         self.assertEqual(cls, billing_defs.GoldPlan)
@@ -231,6 +248,7 @@ class CacheTests(TestCase):
         )
         plans = [
             billing_defs.FreePlan,
+            billing_defs.SecretPlan,
             billing_defs.BronzePlan,
             billing_defs.SilverPlan,
             billing_defs.GoldPlan,
@@ -327,17 +345,15 @@ class BaseViewTestCase(LoggedInUserTestCase):
     urls = 'billing.urls'
 
 class BillingOverviewViewTests(BaseViewTestCase):
-    def test_products_asc_desc(self):
+    def test_products(self):
         r = self.client.get('/')
-        products_desc = [
-            billing_defs.GoldPlan,
-            billing_defs.SilverPlan,
-            billing_defs.BronzePlan,
+        products = [
             billing_defs.FreePlan,
+            billing_defs.BronzePlan,
+            billing_defs.SilverPlan,
+            billing_defs.GoldPlan,
         ]
-        products_asc = reversed(products_desc)
-        self.assertListEqual(list(r.context['products_asc']), list(products_asc))
-        self.assertListEqual(list(r.context['products_desc']), list(products_desc))
+        self.assertListEqual(list(r.context['products']), list(products))
         
 class SubscriptionViewTests(BaseViewTestCase):
     def test_dispatch_not_logged_in(self):

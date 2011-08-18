@@ -51,7 +51,7 @@ class FreePlan(MySaaSAppAccount):
         pricing_scheme=FixedInclusion(included=0)
 
 class SecretPlan(SilverPlan):
-    base_price = 0
+    base_price = 10
     manual_intervention = ManualPreApproval
 
 class EnterprisePlan(GoldPlan):

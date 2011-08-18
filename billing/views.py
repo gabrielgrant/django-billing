@@ -19,25 +19,14 @@ class BillingOverviewView(TemplateView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(BillingOverviewView, self).get_context_data(**kwargs)
-        # Add in a list of all the products (ascending and descending)
-        products = billing.loading.get_products()
-        context['products'] = products
-        products_asc = sorted(products, key=lambda x: x.base_price)
-        context['products_asc'] = products_asc
-        products_desc = sorted(products, key=lambda x: x.base_price, reverse=True)
-        context['products_desc'] = products_desc
+        # Add in a list of all the products
+        context['all_products'] = billing.loading.get_products(hidden=True)
+        context['public_products'] = billing.loading.get_products()
         billing_account = self.request.user.billing_account
         context['billing_account'] = billing_account
+        context['products'] = billing_account.get_visible_products()
         current_product = billing_account.get_current_product_class()
         context['current_product'] = current_product
-        try:
-            index_asc = products_asc.index(current_product)
-            index_desc = products_desc.index(current_product)
-        except ValueError:
-            index_asc = -1
-            index_desc = len(products_desc)
-        context['current_product_index_asc'] = index_asc
-        context['current_product_index_desc'] = index_desc
         return context
 
 class BaseBillingDetailsView(FormView):
