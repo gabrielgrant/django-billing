@@ -2,13 +2,14 @@ import billing.models
 from billing.models import ProductType
 from billing.loading import get_products
 from django.db.models import signals
+import south.signals
 
 # implementation taken from django.contrib.contenttypes:
 # https://github.com/django/django/blob/1.3.X/django/contrib/contenttypes/management.py
 
-def update_producttypes(app, created_models, verbosity=2, **kwargs):
+def update_producttypes(app, verbosity=2, **kwargs):
     # only do this once, after we're synced
-    if app == billing.models:
+    if app == 'billing':
         update_all_producttypes(verbosity)
     else:
         return
@@ -53,7 +54,7 @@ If you're unsure, answer 'no'.
                 print "Stale product types remain."
             
 
-signals.post_syncdb.connect(update_producttypes)
+south.signals.post_migrate.connect(update_producttypes)
 
 if __name__ == "__main__":
     update_all_contenttypes()
