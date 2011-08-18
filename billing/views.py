@@ -66,9 +66,7 @@ class BaseSubscriptionView(BaseBillingDetailsView):
         ba = self.request.user.billing_account
 
         # create subscription
-        pt = ProductType.objects.get(name=self.kwargs['product'])
-        sub = Subscription.objects.create(billing_account=ba, product_type=pt)
-        sub.request_approval()
+        ba.subscribe_to_product(self.kwargs['product'])
 
         # let FormView do redirect
         return FormView.form_valid(self, form)

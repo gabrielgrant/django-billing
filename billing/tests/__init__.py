@@ -38,7 +38,7 @@ class LoggedInUserTestCase(UserTestCase):
 class AccountTests(UserTestCase):
     def setUp(self):
         super(AccountTests, self).setUp()
-        self.a = Account(owner=self.u)
+        self.a = Account.objects.create(owner=self.u)
         
     def tearDown(self):
         pass
@@ -56,6 +56,24 @@ class AccountTests(UserTestCase):
         self.assertFalse(self.a.has_valid_billing_details())
     def test_get_processor(self):
         self.assertEqual(self.a.get_processor(), SimpleAccountBillingProcessor)
+    def test_subscribe_to_product_by_class(self):
+        iou_account = IOUAccount.objects.create(
+            billing_account=self.u.billing_account)
+        AccountIOU.objects.create(iou_account=iou_account, has_agreed_to_pay=True)
+        self.assertIsNone(self.a.get_current_product())
+        self.a.subscribe_to_product(billing_defs.GoldPlan)
+        self.assertEqual(self.a.get_current_product_class(), billing_defs.GoldPlan)
+    def test_subscribe_to_product_by_name(self):
+        iou_account = IOUAccount.objects.create(
+            billing_account=self.u.billing_account)
+        AccountIOU.objects.create(iou_account=iou_account, has_agreed_to_pay=True)
+        self.assertIsNone(self.a.get_current_product())
+        self.a.subscribe_to_product('GoldPlan')
+        self.assertEqual(self.a.get_current_product_class(), billing_defs.GoldPlan)
+    def test_subscribe_to_product_declined(self):
+        self.assertIsNone(self.a.get_current_product())
+        self.a.subscribe_to_product('GoldPlan')
+        self.assertEqual(self.a.get_current_product_class(), None)
 
 
 class ProductTypeTests(TestCase):
@@ -102,7 +120,39 @@ class SubscriptionManagerTests(UserTestCase):
         self.assertIn(self.sub2, Subscription.objects.approved())
         self.assertNotIn(self.sub2, Subscription.objects.pending())
         self.assertNotIn(self.sub2, Subscription.objects.declined())
-        
+    def test_create_from_product_class(self):
+        iou_account = IOUAccount.objects.create(
+            billing_account=self.u.billing_account)
+        AccountIOU.objects.create(iou_account=iou_account, has_agreed_to_pay=True)
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.SilverPlan)
+        Subscription.objects.create_from_product(
+            billing_defs.GoldPlan, self.u.billing_account)
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.GoldPlan)
+    def test_create_from_product_name(self):
+        iou_account = IOUAccount.objects.create(
+            billing_account=self.u.billing_account)
+        AccountIOU.objects.create(iou_account=iou_account, has_agreed_to_pay=True)
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.SilverPlan)
+        Subscription.objects.create_from_product(
+            'GoldPlan', self.u.billing_account)
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.GoldPlan)
+    def test_create_from_product_declined(self):
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.SilverPlan)
+        Subscription.objects.create_from_product(
+            'GoldPlan', self.u.billing_account)
+        self.assertEqual(
+            self.u.billing_account.get_current_product_class(),
+            billing_defs.SilverPlan)
 
 class SubscriptionTests(TestCase):
     def setUp(self):

@@ -77,6 +77,8 @@ class Account(models.Model):
         return processor_router.get_processor_for_account(self)
     def has_valid_billing_details(self):
         return self.get_processor().has_valid_billing_details(self)
+    def subscribe_to_product(self, product):
+        return Subscription.objects.create_from_product(product, self)
     
 
 class ProductTypeManager(models.Manager):
@@ -121,6 +123,14 @@ class SubscriptionManager(models.Manager):
         return self.filter_by_current_status(status='approved')
     def declined(self):
         return self.filter_by_current_status(status='declined')
+    def create_from_product(self, product, billing_account):
+        if isinstance(product, basestring):
+            name = product
+        else:
+            name = product.name
+        pt = ProductType.objects.get(name=name)
+        sub = self.create(billing_account=billing_account, product_type=pt)
+        sub.request_approval()
 
 ACTIVE_SUBSCIPRTION_STATUSES = getattr(settings,
     'BILLING_ACTIVE_SUBSCIPRTION_STATUSES', ('pending', 'approved'))  
