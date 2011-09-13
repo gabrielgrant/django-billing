@@ -54,6 +54,10 @@ class SecretPlan(SilverPlan):
     base_price = 10
     manual_intervention = ManualPreApproval
 
+class SecretFreePlan(BronzePlan):
+    base_price = 0
+    manual_intervention = ManualPreApproval
+
 class EnterprisePlan(GoldPlan):
     manual_intervention = ManualPostApproval
 

@@ -2,6 +2,7 @@
 
 from django.utils import unittest
 from django.test import TestCase
+from django.core.management import call_command
 
 from ordereddict import OrderedDict
 
@@ -101,7 +102,7 @@ class ProductTypeTests(TestCase):
         pass
         
     def test_autodiscover(self):
-        self.assertEqual(ProductType.objects.count(), 5)
+        self.assertEqual(ProductType.objects.count(), 6)
     def test_get_product_class(self):
         cls = ProductType.objects.get(name='GoldPlan').get_product_class()
         self.assertEqual(cls, billing_defs.GoldPlan)
@@ -247,6 +248,7 @@ class CacheTests(TestCase):
             products=BILLING_PRODUCTS,
         )
         plans = [
+            billing_defs.SecretFreePlan,
             billing_defs.FreePlan,
             billing_defs.SecretPlan,
             billing_defs.BronzePlan,
@@ -473,6 +475,20 @@ class ProcessorTests(TestCase):
         
     def test_init(self):
         pass
+
+### Management Command Tests ###
+
+class SubscribeCommandTest(UserTestCase):
+    def test_subscribe_by_id(self):
+        call_command('subscribe_user_to_product', 'testuser', 'SecretFreePlan')
+        cur_prod = self.u.billing_account.get_current_product_class()
+        self.assertEqual(cur_prod, billing_defs.SecretFreePlan)
+    def test_subscribe_by_username(self):
+        call_command('subscribe_user_to_product', '1', 'SecretFreePlan')
+        cur_prod = self.u.billing_account.get_current_product_class()
+        self.assertEqual(cur_prod, billing_defs.SecretFreePlan)
+    def test_list_plans(self):
+        call_command('subscribe_user_to_product')
 
 def main():
     unittest.main()

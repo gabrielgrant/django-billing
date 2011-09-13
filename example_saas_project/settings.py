@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'south',
     'billing',
+    'billing_management',
     'billing.processor.simple_account',
     'example_saas_project.core',
 )
