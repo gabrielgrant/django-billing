@@ -11,6 +11,7 @@ setup(
         'billing.templatetags',
         'billing.tests',
     ],
+    namespace_packages=['billing', 'billing.processor'],
     license='LGPL',
     long_description=open('README').read(),
     install_requires=[
