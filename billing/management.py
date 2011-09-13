@@ -10,12 +10,12 @@ import south.signals
 def update_producttypes(app, verbosity=2, **kwargs):
     # only do this once, after we're synced
     if app == 'billing' or app == billing.models:
-        update_all_producttypes(verbosity)
+        update_all_producttypes(verbosity, **kwargs)
     else:
         return
     
 
-def update_all_producttypes(verbosity=2):
+def update_all_producttypes(verbosity=2, **kwargs):
     
     product_types = list(ProductType.objects.all())
     for product in get_products(hidden=True):
