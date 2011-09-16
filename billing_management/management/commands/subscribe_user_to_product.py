@@ -5,7 +5,8 @@ from billing.loading import get_products
 from pricing.manual_intervention import ManualPreApproval
 
 class Command(BaseCommand):
-    help = "Subscribes the given user to a product"
+    help = "Subscribes the given user to a product.\n"  \
+    "Lists available products if no arguments are given"
     args = "<userid|username> <product_name>"
 
     def handle(self, *args, **options):
@@ -16,9 +17,10 @@ class Command(BaseCommand):
                 return '%s%s' % (p.name, ' (hidden)' if hidden else '')
             plan_strs = [get_plan_str(p) for p in get_products(hidden=True)]
             self.stdout.write(
-                'Available plans:\n%s' %
+                '\nAvailable plans:\n\n%s' %
                 '\n'.join(plan_strs)
             )
+            self.stdout.write('\n\n\nFor full help, use --help\n\n')
             return
         elif len(args) != 2:
             raise CommandError(

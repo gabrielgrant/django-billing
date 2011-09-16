@@ -180,3 +180,10 @@ master router yields the `default` router.
 
 This architecture/API is very much inspired by Django's database routers
 
+Management Commands
+===================
+
+django-billing provides the 'subscribe_user_to_product' management command
+to manually subscribe a user. This is especially useful when providing
+products which require manual pre-approval (i.e. products to which the user
+should not be able to subscribe themselves).
