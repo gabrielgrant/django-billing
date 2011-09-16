@@ -11,6 +11,8 @@ setup(
         'billing.templatetags',
         'billing.tests',
         'billing_management',
+        'billing_management.management',
+        'billing_management.management.commands',
     ],
     namespace_packages=['billing', 'billing.processor'],
     license='LGPL',
