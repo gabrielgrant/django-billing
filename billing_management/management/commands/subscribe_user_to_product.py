@@ -49,7 +49,7 @@ class Command(BaseCommand):
             user = user_by_name or user_by_id
         user.billing_account.subscribe_to_product(product_name)
         self.stdout.write(
-            'Successfully subscribed User(id=%s, username=%s, email=%s) to %s' %
+            '\nSuccessfully subscribed User(id=%s, username=%s, email=%s) to %s\n\n' %
             (user.id, user.username, user.email, product_name)
         )
 

@@ -89,6 +89,10 @@ class Account(models.Model):
         subscribed_products = set(pt.get_product_class() for pt in subscribed_product_types)
         visible_products = set(public_products).union(subscribed_products)
         return [p for p in all_products if p in visible_products]
+    def __unicode__(self):
+        return "%s's account" % unicode(self.owner)
+    def __repr__(self):
+        return "Account(owner=%s)" % repr(self.owner)
 
 class ProductTypeManager(models.Manager):
     def get_for_product(self, product):
@@ -102,9 +106,9 @@ class ProductType(models.Model):
     def get_product_class(self):
         return billing.loading.get_product(self.name)
     def __unicode__(self):
-        return 'ProductType(name=%s)' % self.name
+        return self.name
     def __repr__(self):
-        return self.__unicode__()
+        return 'ProductType(name=%s)' % self.name
 
 class SubscriptionManager(models.Manager):
     def filter_by_current_statuses(self, statuses):
@@ -176,9 +180,9 @@ class Subscription(models.Model):
     def request_approval(self):
         ready_for_approval.send(sender=self)
     def __unicode__(self):
-        return 'Subscription(product=%s, approval_status=%s)' % (self.product_type.name, self.get_current_approval_status())
+        return '%s (%s)' % (self.product_type.name, self.get_current_approval_status())
     def __repr__(self):
-        return self.__unicode__()
+        return 'Subscription(product=%s, approval_status=%s)' % (self.product_type.name, self.get_current_approval_status())
 
 @receiver(signals.post_save, sender=Subscription)
 def auto_add_subscription_approval_status(instance, created, **kwargs):
