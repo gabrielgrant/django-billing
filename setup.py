@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-billing',
-    version='0.1.3dev',
+    version='0.1.3',
     author='Gabriel Grant',
     packages=[
         'billing',
