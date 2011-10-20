@@ -50,15 +50,15 @@ class BaseSubscriptionView(BaseBillingDetailsView):
         context['product'] = product
         return context
     def form_valid(self, form):
-        super(BaseSubscriptionView, self).form_valid(form)
+        response = super(BaseSubscriptionView, self).form_valid(form)
 
         ba = self.request.user.billing_account
 
         # create subscription
         ba.subscribe_to_product(self.kwargs['product'])
 
-        # let FormView do redirect
-        return FormView.form_valid(self, form)
+        # return the redirect
+        return response
 
 class SubscriptionConfirmationView(BaseSubscriptionView):
     """
