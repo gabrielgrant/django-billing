@@ -446,6 +446,15 @@ class SubscriptionViewTests(BaseViewTestCase):
         cur_prod = self.u.billing_account.get_current_product_class()
         self.assertEqual(cur_prod, billing_defs.FreePlan)
 
+    def test_subscribe_to_hidden_product(self):
+        r = self.client.get('/subscription/SecretPlan/')
+        self.assertEqual(r.status_code, 404)
+
+    def test_resubscribe_to_hidden_product(self):
+        self.u.billing_account.subscribe_to_product('SecretPlan')
+        r = self.client.get('/subscription/SecretPlan/')
+        self.assertEqual(r.status_code, 200)
+
 class BillingHistoryViewTests(BaseViewTestCase):
     def test_fetch(self):
         r = self.client.get('/history/')

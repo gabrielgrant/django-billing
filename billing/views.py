@@ -148,6 +148,8 @@ def subscription_view(
             req_product_cls = billing.loading.get_product(req_product_name)
         except ValueError:
             raise Http404
+        if req_product_cls not in request.user.billing_account.get_visible_products():
+            raise Http404
         if cur_product_cls == req_product_cls:
             return current_subscription_view(request, *args, **kwargs)
         elif (
