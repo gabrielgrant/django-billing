@@ -39,8 +39,8 @@ class BaseBillingDetailsView(FormView):
         form.billing_account = ba
         form.save()
 
-        # don't do redirect -- allow for more processing
-        return
+        # do redirect (or do more processing by ignoring return value)
+        return super(BaseBillingDetailsView, self).form_valid(form)
 
 class BaseSubscriptionView(BaseBillingDetailsView):
     def get_context_data(self, **kwargs):

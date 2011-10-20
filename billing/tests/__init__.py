@@ -455,7 +455,8 @@ class BillingDetailsViewTests(BaseViewTestCase):
     def test_products_asc_desc(self):
         r = self.client.get('/details/')
         self.assertEqual(r.status_code, 200)
-        
+        r = self.client.post('/details/', {'has_agreed_to_pay': True}, follow=True)
+        self.assertEqual(r.status_code, 200)
 
 ###  Template Tag Tests  ###
 
