@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-billing',
-    version='0.1.4',
+    version='0.1.5',
     author='Gabriel Grant',
     packages=[
         'billing',
@@ -15,7 +15,7 @@ setup(
         'billing_management.management.commands',
     ],
     namespace_packages=['billing', 'billing.processor'],
-    license='LGPL',
+    license='AGPL',
     long_description=open('README').read(),
     install_requires=[
         'python-pricing',
