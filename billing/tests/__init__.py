@@ -106,6 +106,10 @@ class ProductTypeTests(TestCase):
     def test_get_product_class(self):
         cls = ProductType.objects.get(name='GoldPlan').get_product_class()
         self.assertEqual(cls, billing_defs.GoldPlan)
+    def test_get_by_nautral_key(self):
+        self.assertEqual(ProductType.objects.get_by_natural_key('GoldPlan').name, 'GoldPlan')
+    def test_natural_key(self):
+        self.assertEqual(ProductType.objects.get(name='GoldPlan').natural_key(), 'GoldPlan')
 
 class SubscriptionManagerTests(UserTestCase):
     def setUp(self):

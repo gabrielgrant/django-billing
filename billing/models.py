@@ -97,8 +97,8 @@ class Account(models.Model):
 class ProductTypeManager(models.Manager):
     def get_for_product(self, product):
         return self.get(name=product.__name__)
-    def get_by_natural_key(self, app, product):
-        raise NotImplementedError
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
 
 class ProductType(models.Model):
     name = models.CharField(max_length=100)
@@ -109,6 +109,8 @@ class ProductType(models.Model):
         return self.name
     def __repr__(self):
         return 'ProductType(name=%s)' % self.name
+    def natural_key(self):
+        return self.name
 
 class SubscriptionManager(models.Manager):
     def filter_by_current_statuses(self, statuses):
