@@ -110,7 +110,7 @@ class ProductType(models.Model):
     def __repr__(self):
         return 'ProductType(name=%s)' % self.name
     def natural_key(self):
-        return self.name
+        return (self.name,)
 
 class SubscriptionManager(models.Manager):
     def filter_by_current_statuses(self, statuses):

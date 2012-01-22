@@ -3,6 +3,9 @@
 from django.utils import unittest
 from django.test import TestCase
 from django.core.management import call_command
+from django.core import serializers
+
+JSONSerializer = serializers.get_serializer("json")
 
 from ordereddict import OrderedDict
 
@@ -94,13 +97,7 @@ class AccountTests(UserTestCase):
         self.a.subscribe_to_product(billing_defs.SecretPlan)
         self.assertListEqual(self.a.get_visible_products(), all_products)
 
-class ProductTypeTests(TestCase):
-    def setUp(self):
-        pass
-        
-    def tearDown(self):
-        pass
-        
+class ProductTypeTests(UserTestCase):
     def test_autodiscover(self):
         self.assertEqual(ProductType.objects.count(), 6)
     def test_get_product_class(self):
@@ -109,7 +106,14 @@ class ProductTypeTests(TestCase):
     def test_get_by_nautral_key(self):
         self.assertEqual(ProductType.objects.get_by_natural_key('GoldPlan').name, 'GoldPlan')
     def test_natural_key(self):
-        self.assertEqual(ProductType.objects.get(name='GoldPlan').natural_key(), 'GoldPlan')
+        self.assertEqual(ProductType.objects.get(name='GoldPlan').natural_key(), ('GoldPlan',))
+    def test_serialization_deserialization_natural(self):
+        serializer = JSONSerializer()
+        Subscription.objects.create_from_product(
+            billing_defs.GoldPlan, self.u.billing_account)
+        s = serializer.serialize(Subscription.objects.all(), use_natural_keys=True)
+        deserialized = list(serializers.deserialize('json', s))[0]
+        self.assertEqual(deserialized.object, Subscription.objects.get())
 
 class SubscriptionManagerTests(UserTestCase):
     def setUp(self):
