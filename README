@@ -123,7 +123,13 @@ TODO
 Motivation
 ==========
 
-TODO
+A few years ago, I had a side project that I was ready to launch as a small business. All I needed to do was figure out how to charge for it. Turns out billing systems are hard to build.
+
+But pretty much every company needs one, so a number of SaaS companies have sprung up recently to help handle recurring payments. Unfortunately they only deal with actually issuing a charge. Tracking usage, and determining whether a user has permission to perform an action in the app (possibly based on their usage-to-date or their plan level) is still left up to the app developer.
+
+Because this information is so tightly linked with the app itself, it does make sense to keep this functionality within the app rather than in a third-party service, but it doesn't make sense for everyone to reimplement it themselves.
+
+Ideally, by making it easier to implement a pricing model, django-billing can help smaller projects close the time gap between first creating value for users and actually capturing some of that value for themselves.
 
 
 Billing Processors
