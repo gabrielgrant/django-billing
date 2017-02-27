@@ -16,7 +16,7 @@ setup(
     ],
     namespace_packages=['billing', 'billing.processor'],
     license='AGPL',
-    long_description=open('README').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         'python-pricing',
         'django-annoying',
